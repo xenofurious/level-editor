@@ -16,6 +16,12 @@ bool looping = true;
 
 int margin = 2;
 
+// functions
+void save(unsigned short **savebuf, int_coord map_dim, char *filename);
+void create_new_savefile(unsigned short **savebuf, int_coord map_dim, char *filename);
+void update_file(unsigned short **save_buf, int_coord map_dim, char *filename);
+
+
 
 unsigned short **init_save_buffer(int_coord map_coords) {
     unsigned short** arr;
@@ -38,7 +44,21 @@ void deinit_save_buffer(unsigned short **arr, int_coord map_coords) {
     free(arr); 
 }
 
-void write_save_buf_to_file(unsigned short **save_buf, int_coord map_dim, FILE *fileptr) {
+void save(unsigned short **save_buf, int_coord map_dim, char *filename) {
+    FILE *fp = fopen(filename, "r+");
+    if (fp == NULL) {
+        create_new_savefile(save_buf, map_dim, filename);
+    } else {
+        update_file(save_buf, map_dim, filename);
+    }
+}
+
+void create_new_savefile(unsigned short **save_buf, int_coord map_dim, char *filename) {
+    FILE *fp = fopen(filename, "w");
+}
+
+void update_file(unsigned short **save_buf, int_coord map_dim, char *filename) {
+    FILE *fp = fopen(filename, "r+");
 
 
 
