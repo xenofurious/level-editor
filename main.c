@@ -31,7 +31,7 @@ unsigned short **init_save_buffer(int_coord map_coords) {
 
     for (int i = 0; i < map_coords.x; i++) {
         for (int j = 0; j < map_coords.y; j++) {
-            arr[i][j] = -1; 
+            arr[i][j] = 0;
         }
     }
     return arr;
@@ -55,16 +55,22 @@ void save(unsigned short **save_buf, int_coord map_dim, char *filename) {
 
 void create_new_savefile(unsigned short **save_buf, int_coord map_dim, char *filename) {
     FILE *fp = fopen(filename, "w");
+    fprintf(fp, "%d %d\n", map_dim.x, map_dim.y);
+    
+    for (int i = 0; i < map_dim.x; i++) {
+        for (int j = 0; j < map_dim.y; j++) {
+            fprintf(fp, "%hu ", save_buf[i][j]);
+        }
+        fprintf(fp, "\n");
+    }
 }
 
 void update_file(unsigned short **save_buf, int_coord map_dim, char *filename) {
     FILE *fp = fopen(filename, "r+");
-
-
-
 }
 
 
+// MAIN //
 
 int main(int argc, char *argv[]) {
     if (argc == 1) {
@@ -132,14 +138,20 @@ int main(int argc, char *argv[]) {
             case '0': case '1': case '2': case '3': case '4': case '5':
                 printch = input;
                 mvwaddch(windows[2], cursor_pos.y, cursor_pos.x, printch);
-                if (cursor_pos.x == map_dim.x && cursor_pos.y != map_dim.y) {
+                mvwprintw(windows[1], 0, 7, "%d", cursor_pos.x);
+                mvwprintw(windows[1], 0, 10, "%d", cursor_pos.y);
+                save_buf[cursor_pos.y][cursor_pos.x] = printch-'0';
+
+                if (cursor_pos.x == map_dim.x-1 && cursor_pos.y != map_dim.y-1) {
                     cursor_pos.x=0;
                     cursor_pos.y++;
-                } else {
+                } else if (cursor_pos.x != map_dim.x-1){
                     cursor_pos.x++;
-                }
+                } 
                 break;
-            
+
+            case 's': save(save_buf, map_dim, "test_map");
+
         }
         update_panels();
         doupdate();
