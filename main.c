@@ -45,15 +45,6 @@ void deinit_save_buffer(unsigned short **arr, int_coord map_coords) {
 }
 
 void save(unsigned short **save_buf, int_coord map_dim, char *filename) {
-    FILE *fp = fopen(filename, "r+");
-    if (fp == NULL) {
-        create_new_savefile(save_buf, map_dim, filename);
-    } else {
-        update_file(save_buf, map_dim, filename);
-    }
-}
-
-void create_new_savefile(unsigned short **save_buf, int_coord map_dim, char *filename) {
     FILE *fp = fopen(filename, "w");
     fprintf(fp, "%d %d\n", map_dim.x, map_dim.y);
     
@@ -65,9 +56,7 @@ void create_new_savefile(unsigned short **save_buf, int_coord map_dim, char *fil
     }
 }
 
-void update_file(unsigned short **save_buf, int_coord map_dim, char *filename) {
-    FILE *fp = fopen(filename, "r+");
-}
+
 
 // MAIN //
 
@@ -161,17 +150,16 @@ int main(int argc, char *argv[]) {
                 } 
                 break;
 
-            case 's': save(save_buf, map_dim, "test_map");
+            case 's': save(save_buf, map_dim, "test_map"); break;
 
         }
         mvwprintw(windows[1], 0, 7, "%d", cursor_pos.x);
         mvwprintw(windows[1], 0, 10, "%d", cursor_pos.y);
 
         
-        wmove(windows[2], cursor_pos.y, cursor_pos.x);
-        wrefresh(windows[2]); 
+        wmove(windows[3], cursor_pos.y, cursor_pos.x);
+        wrefresh(windows[3]);
         // line is not visually updating cursor for some reason.
- 
 
         update_panels();
         doupdate();
