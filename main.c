@@ -8,13 +8,13 @@
 
 int_coord cursor_pos = (int_coord) {0, 0};
 int map_height, map_width, starty, startx;
-int input; 
-
+int input = 0;
 char printch;
 
 bool looping = true;
 
-int margin = 2;
+int small_margin = 2;
+int large_margin = 4;
 
 // functions
 void save(unsigned short **savebuf, int_coord map_dim, char *filename);
@@ -69,7 +69,6 @@ void update_file(unsigned short **save_buf, int_coord map_dim, char *filename) {
     FILE *fp = fopen(filename, "r+");
 }
 
-
 // MAIN //
 
 int main(int argc, char *argv[]) {
@@ -100,18 +99,25 @@ int main(int argc, char *argv[]) {
     initscr();
     cbreak();
     noecho();
+    start_color();
+    define_colours();
 
     starty = (LINES - map_dim.y) / 2;
 	startx = (COLS - map_dim.x) / 2;
-    PANEL *panels[3];
-    WINDOW *windows[3];
+    PANEL *panels[4];
+    WINDOW *windows[4];
 
-    windows[0] = newwin(map_dim.y+10, map_dim.x+20, starty-5, startx-10); 
-    windows[1] = newwin(map_dim.y+margin*2, map_dim.x+margin*2, starty-margin, startx-margin);
-    windows[2] = newwin(map_dim.y, map_dim.x, starty, startx);
+    int window_xmargin = 40;
+    int window_ymargin = 30;
+
+    windows[0] = newwin(map_dim.y+window_ymargin, map_dim.x+window_xmargin, starty-window_ymargin/2, startx-window_xmargin/2); 
+    windows[1] = newwin(map_dim.y+small_margin*2, map_dim.x+small_margin*2, starty-small_margin, startx-small_margin);
+    windows[3] = newwin(map_dim.y, map_dim.x, starty, startx);
+    windows[2] = newwin(window_ymargin/2 - large_margin*2 + 1, map_dim.x + window_xmargin-large_margin*2, starty+map_dim.y+large_margin, startx-window_xmargin/2 + large_margin);
 
     box(windows[0], 0, 0);
     box(windows[1], 0, 0);
+    box(windows[2], 0, 0);
 
     mvwprintw(windows[0], 0, 2, " map editor ");
     mvwprintw(windows[1], 0, 2, " map ");
@@ -119,6 +125,7 @@ int main(int argc, char *argv[]) {
     panels[0] = new_panel(windows[0]);
     panels[1] = new_panel(windows[1]);
     panels[2] = new_panel(windows[2]);
+    panels[3] = new_panel(windows[3]);
 
     update_panels();
     doupdate(); 
@@ -129,17 +136,21 @@ int main(int argc, char *argv[]) {
     while (looping) {
         switch (input = getch()){
             case 'q': looping = false; break;
-
-            case KEY_UP: case 'k': cursor_pos.y--; break;
-            case KEY_DOWN: case 'j': cursor_pos.y++; break;
-            case KEY_LEFT: case 'h': cursor_pos.x--; break;
-            case KEY_RIGHT: case 'l': cursor_pos.x++; break;
+            
+            case KEY_UP: case 'k': 
+                cursor_pos.y--; cursor_pos.y = CLAMP_MIN(cursor_pos.y, 0); break;
+            case KEY_DOWN: case 'j':
+                cursor_pos.y++; cursor_pos.y = CLAMP_MAX(cursor_pos.y, map_dim.y-1); break;
+            case KEY_LEFT: case 'h':
+                cursor_pos.x--; cursor_pos.x = CLAMP_MIN(cursor_pos.x, 0); break;
+            case KEY_RIGHT: case 'l':
+                cursor_pos.x++; cursor_pos.x = CLAMP_MAX(cursor_pos.x, map_dim.x-1); break;
             
             case '0': case '1': case '2': case '3': case '4': case '5':
                 printch = input;
-                mvwaddch(windows[2], cursor_pos.y, cursor_pos.x, printch);
-                mvwprintw(windows[1], 0, 7, "%d", cursor_pos.x);
-                mvwprintw(windows[1], 0, 10, "%d", cursor_pos.y);
+                mvwaddch(windows[3], cursor_pos.y, cursor_pos.x, printch);
+                // add character
+                
                 save_buf[cursor_pos.y][cursor_pos.x] = printch-'0';
 
                 if (cursor_pos.x == map_dim.x-1 && cursor_pos.y != map_dim.y-1) {
@@ -153,6 +164,15 @@ int main(int argc, char *argv[]) {
             case 's': save(save_buf, map_dim, "test_map");
 
         }
+        mvwprintw(windows[1], 0, 7, "%d", cursor_pos.x);
+        mvwprintw(windows[1], 0, 10, "%d", cursor_pos.y);
+
+        
+        wmove(windows[2], cursor_pos.y, cursor_pos.x);
+        wrefresh(windows[2]); 
+        // line is not visually updating cursor for some reason.
+ 
+
         update_panels();
         doupdate();
     }
