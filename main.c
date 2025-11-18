@@ -115,11 +115,13 @@ int main(int argc, char *argv[]) {
     panels[1] = new_panel(windows[1]);
     panels[2] = new_panel(windows[2]);
     panels[3] = new_panel(windows[3]);
+    
+    keypad(stdscr, TRUE);
 
     update_panels();
     doupdate(); 
 
-
+    
     unsigned short **save_buf = init_save_buffer(map_dim);
 
     while (looping) {
@@ -138,16 +140,12 @@ int main(int argc, char *argv[]) {
             case '0': case '1': case '2': case '3': case '4': case '5':
                 printch = input;
                 mvwaddch(windows[3], cursor_pos.y, cursor_pos.x, printch);
-                // add character
-                
                 save_buf[cursor_pos.y][cursor_pos.x] = printch-'0';
+                break;
 
-                if (cursor_pos.x == map_dim.x-1 && cursor_pos.y != map_dim.y-1) {
-                    cursor_pos.x=0;
-                    cursor_pos.y++;
-                } else if (cursor_pos.x != map_dim.x-1){
-                    cursor_pos.x++;
-                } 
+            case KEY_BACKSPACE: case 'x':
+                mvwaddch(windows[3], cursor_pos.y, cursor_pos.x, ' ');
+                save_buf[cursor_pos.y][cursor_pos.x] = 1;
                 break;
 
             case 's': save(save_buf, map_dim, "test_map"); break;
