@@ -31,7 +31,7 @@ unsigned short **init_save_buffer(int_coord map_coords) {
 
     for (int i = 0; i < map_coords.x; i++) {
         for (int j = 0; j < map_coords.y; j++) {
-            arr[i][j] = 0;
+            arr[i][j] = 1;
         }
     }
     return arr;
@@ -148,16 +148,17 @@ int main(int argc, char *argv[]) {
                 save_buf[cursor_pos.y][cursor_pos.x] = 1;
                 break;
 
-            case 's': save(save_buf, map_dim, "test_map"); break;
+            case 's':
+                save(save_buf, map_dim, "test_map");
+                mvwprintw(windows[0], map_dim.y + window_ymargin - 2, 2, "saved to \"test_map\"");
+                break;
 
         }
         mvwprintw(windows[1], 0, 7, "%d", cursor_pos.x);
         mvwprintw(windows[1], 0, 10, "%d", cursor_pos.y);
 
-        
         wmove(windows[3], cursor_pos.y, cursor_pos.x);
         wrefresh(windows[3]);
-        // line is not visually updating cursor for some reason.
 
         update_panels();
         doupdate();
