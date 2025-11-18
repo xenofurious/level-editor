@@ -8,9 +8,6 @@ typedef struct {
     float y;
 } float_coord;
 
-void define_colours();
-
-
 
 // macros
 

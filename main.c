@@ -89,7 +89,6 @@ int main(int argc, char *argv[]) {
     cbreak();
     noecho();
     start_color();
-    define_colours();
 
     starty = (LINES - map_dim.y) / 2;
 	startx = (COLS - map_dim.x) / 2;
