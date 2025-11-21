@@ -56,6 +56,8 @@ void save(unsigned short **save_buf, int_coord map_dim, char *filename) {
     }
 }
 
+int window_xmargin = 50;
+int window_ymargin = 36;
 
 
 // MAIN //
@@ -67,11 +69,9 @@ int main(int argc, char *argv[]) {
         printf("Please enter coordinates correctly, or leave blank for default size.\n");
     } else {
         map_width = atoi(argv[1]);
-        map_height = atoi(argv[2]); 
-        
+        map_height = atoi(argv[2]);
 
         for (int i = 3; i < argc; i++) {
-
             // switch statement for flags
             if (argv[i][0] == '-'){
                 switch (argv[i][1]) {
@@ -94,9 +94,18 @@ int main(int argc, char *argv[]) {
 	startx = (COLS - map_dim.x) / 2;
     PANEL *panels[4];
     WINDOW *windows[4];
-
-    int window_xmargin = 50;
-    int window_ymargin = 40;
+    
+    // check if terminal dimensions are appropriate for program
+    if (window_xmargin + map_width > COLS) {
+        printf("window too thin to run program\n");
+        endwin();
+        return 1;
+    }
+    if (window_ymargin + map_height > LINES) {
+        printf("window not tall enough to run program\n");
+        endwin();
+        return 1;
+    }
 
     windows[0] = newwin(map_dim.y+window_ymargin, map_dim.x+window_xmargin, starty-window_ymargin/2, startx-window_xmargin/2); 
     windows[1] = newwin(map_dim.y+small_margin*2, map_dim.x+small_margin*2, starty-small_margin, startx-small_margin);
@@ -117,7 +126,7 @@ int main(int argc, char *argv[]) {
     
     keypad(stdscr, TRUE);
 
-    // shortcut list
+    // print shortcut list
     mvwprintw(windows[2], 1, 2, " shortcuts ");
 
     mvwprintw(windows[2], 3, 2, " s: save ");
