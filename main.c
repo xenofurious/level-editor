@@ -95,13 +95,13 @@ int main(int argc, char *argv[]) {
     PANEL *panels[4];
     WINDOW *windows[4];
 
-    int window_xmargin = 40;
-    int window_ymargin = 30;
+    int window_xmargin = 50;
+    int window_ymargin = 40;
 
     windows[0] = newwin(map_dim.y+window_ymargin, map_dim.x+window_xmargin, starty-window_ymargin/2, startx-window_xmargin/2); 
     windows[1] = newwin(map_dim.y+small_margin*2, map_dim.x+small_margin*2, starty-small_margin, startx-small_margin);
-    windows[3] = newwin(map_dim.y, map_dim.x, starty, startx);
     windows[2] = newwin(window_ymargin/2 - large_margin*2 + 1, map_dim.x + window_xmargin-large_margin*2, starty+map_dim.y+large_margin, startx-window_xmargin/2 + large_margin);
+    windows[3] = newwin(map_dim.y, map_dim.x, starty, startx);
 
     box(windows[0], 0, 0);
     box(windows[1], 0, 0);
@@ -117,9 +117,26 @@ int main(int argc, char *argv[]) {
     
     keypad(stdscr, TRUE);
 
+    // shortcut list
+    mvwprintw(windows[2], 1, 2, " shortcuts ");
+
+    mvwprintw(windows[2], 3, 2, " s: save ");
+    mvwprintw(windows[2], 4, 2, " arrow keys : move ");
+    mvwprintw(windows[2], 5, 2, " hjkl : move ");
+    mvwprintw(windows[2], 6, 2, " q: quit ");
+
+    mvwprintw(windows[2], 1, window_xmargin/2, " object types ");
+
+    mvwprintw(windows[2], 3, window_xmargin/2, " 0: white ");
+    mvwprintw(windows[2], 4, window_xmargin/2, " 1: empty ");
+    mvwprintw(windows[2], 5, window_xmargin/2, " 2: red ");
+    mvwprintw(windows[2], 6, window_xmargin/2, " 3: blue ");
+    mvwprintw(windows[2], 7, window_xmargin/2, " 4: green ");
+    mvwprintw(windows[2], 8, window_xmargin/2, " 5: yellow ");
+    wrefresh(windows[2]);    
+
     update_panels();
     doupdate(); 
-
     
     unsigned short **save_buf = init_save_buffer(map_dim);
 
